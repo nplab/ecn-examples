@@ -48,10 +48,10 @@ main(void) {
 
 	if (setsockopt(fd, IPPROTO_IPV6, IPV6_RECVTCLASS, &on, sizeof(int)) < 0)
 		perror("IPV6_RECVTCLASS");
-//#if defined(__linux__)
+#if defined(__linux__)
 	if (setsockopt(fd, IPPROTO_IP, IP_RECVTOS, &on, sizeof(int)) < 0)
 		perror("IP_RECVTOS");
-//#endif
+#endif
 
 	for (;;) {
 		if (recvmsg(fd, &msg, 0) < 0) {
