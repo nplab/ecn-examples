@@ -46,6 +46,7 @@ main(int argc, char *argv[]) {
 	if (sendmsg(fd, &msg, 0) < 0)
 		perror("sendmsg");
 
+	/* Set the TCLASS to be used on the socket to 1 and send a message. */
 #if defined(__linux__)
 	if (IN6_IS_ADDR_V4MAPPED(&addr.sin6_addr)) {
 		if (setsockopt(fd, IPPROTO_IP, IP_TOS, &tclass, sizeof(int)) < 0)
@@ -55,7 +56,6 @@ main(int argc, char *argv[]) {
 			perror("IPV6_TCLASS");
 	}
 #else
-	/* Set the TCLASS to be used on the socket to 1 and send a message. */
 	if (setsockopt(fd, IPPROTO_IPV6, IPV6_TCLASS, &tclass, sizeof(int)) < 0)
 		perror("IPV6_TCLASS");
 #endif
