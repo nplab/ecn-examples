@@ -57,7 +57,7 @@ main(void) {
 #endif
 			    (cmsg->cmsg_len == CMSG_LEN(sizeof(unsigned char)))) {
 				tos = *(unsigned char *)CMSG_DATA(cmsg);
-				printf("tos = %u\n", tos);
+				printf("tos = 0x%02x\n", tos);
 			}
 		}
 	}

@@ -1,11 +1,17 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <netinet/ip.h>
 #include <arpa/inet.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+
+#if defined(__APPLE__)
+#define IPTOS_DSCP_AF41 0x88
+#define IPTOS_DSCP_AF42 0x90
+#endif
 
 int
 main(int argc, char *argv[]) {
@@ -31,7 +37,7 @@ main(int argc, char *argv[]) {
 	struct cmsghdr *cmsg = (struct cmsghdr *)cmsgbuf;
 	int fd;
 	const int on = 1, off = 0;
-	int tclass = 1;
+	int tclass = IPTOS_DSCP_AF41 | IPTOS_ECN_ECT1;
 
 	if (inet_pton(AF_INET6, argv[1], &addr.sin6_addr) != 1)
 		printf("inet_pton() unsuccessful\n");
@@ -42,11 +48,11 @@ main(int argc, char *argv[]) {
 	if (setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, &off, sizeof(int)) < 0)
 		perror("IPV6_V6ONLY");
 
-	/* Send the message with the default TCLASS. */
+	/* Send the message with the system wide default TCLASS. */
 	if (sendmsg(fd, &msg, 0) < 0)
 		perror("sendmsg");
 
-	/* Set the TCLASS to be used on the socket to 1 and send a message. */
+	/* Set the default TCLASS to be used on the socket to AF41 with ECT1. */
 #if defined(__linux__)
 	if (IN6_IS_ADDR_V4MAPPED(&addr.sin6_addr)) {
 		if (setsockopt(fd, IPPROTO_IP, IP_TOS, &tclass, sizeof(int)) < 0)
@@ -59,10 +65,11 @@ main(int argc, char *argv[]) {
 	if (setsockopt(fd, IPPROTO_IPV6, IPV6_TCLASS, &tclass, sizeof(int)) < 0)
 		perror("IPV6_TCLASS");
 #endif
+	/* Send a message with the default socket TCLASS (AF41 with ECT1). */
 	if (sendmsg(fd, &msg, 0) < 0)
 		perror("sendmsg");
 
-	/* Send another message, this time with the TOS of 2. */
+	/* Send another message, this time with the TCLASS of AF42 and CE. */
 #if defined(__linux__)
 	if (IN6_IS_ADDR_V4MAPPED(&addr.sin6_addr)) {
 		cmsg->cmsg_level = IPPROTO_IP;
@@ -76,13 +83,13 @@ main(int argc, char *argv[]) {
 	cmsg->cmsg_type = IPV6_TCLASS;
 #endif
 	cmsg->cmsg_len = CMSG_LEN(sizeof(int));
-	*(int *)CMSG_DATA(cmsg) = 2;
+	*(int *)CMSG_DATA(cmsg) = IPTOS_DSCP_AF42 | IPTOS_ECN_CE;
 	msg.msg_control = cmsgbuf;
 	msg.msg_controllen = CMSG_SPACE(sizeof(int));
 	if (sendmsg(fd, &msg, 0) < 0)
 		perror("sendmsg");
 
-	/* Send a final message with the socket default of 1. */
+	/* Send a final message with the default socket TCLASS (AF41 with ECT1). */
 	msg.msg_control = NULL;
 	msg.msg_controllen = 0;
 	if (sendmsg(fd, &msg, 0) < 0)

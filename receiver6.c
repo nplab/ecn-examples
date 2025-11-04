@@ -64,14 +64,14 @@ main(void) {
 			    (cmsg->cmsg_type == IP_TOS) &&
 			    (cmsg->cmsg_len == CMSG_LEN(sizeof(unsigned char)))) {
 				tos = *(unsigned char *)CMSG_DATA(cmsg);
-				printf("tos = %u\n", tos);
+				printf("tos = 0x%02x\n", tos);
 			}
 #endif
 			if ((cmsg->cmsg_level == IPPROTO_IPV6) &&
 			    (cmsg->cmsg_type == IPV6_TCLASS) &&
 			    (cmsg->cmsg_len == CMSG_LEN(sizeof(int)))) {
 				tclass = *(int *)CMSG_DATA(cmsg);
-				printf("tclass = %d\n", tclass);
+				printf("tclass = 0x%02x\n", tclass);
 			}
 		}
 	}
