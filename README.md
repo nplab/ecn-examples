@@ -25,48 +25,59 @@ gcc -o sender6 sender6.c
 ```
 # Execution
 ## Output of `receiver4`
-When running `sender4 127.0.0.1` the output of `receiver4` is on all platforms:
-```
-tos = 0x00
-tos = 0x89
-tos = 0x93
-tos = 0x89
-```
-When running `sender6 ::ffff:127.0.0.1` the output is of `receiver4` on macOS:
-```
-tos = 0x00
-tos = 0x01
-tos = 0x93
-tos = 0x01
-```
-When running `sender6 ::ffff:127.0.0.1` the output of of `receiver4` is on FreeBSD or Linux:
-```
-tos = 0x00
-tos = 0x89
-tos = 0x93
-tos = 0x89
-```
+
+### FreeBSD
+| `sender4 127.0.0.1` | `sender6 ::ffff:127.0.0.1` |
+|:-------------------:|:--------------------------:|
+|`tos = 0x00`         |`tos = 0x00`                |
+|`tos = 0x89`         |`tos = 0x89`                |
+|`tos = 0x93`         |`tos = 0x93`                |
+|`tos = 0x89`         |`tos = 0x89`                |
+
+### Linux
+| `sender4 127.0.0.1` | `sender6 ::ffff:127.0.0.1` |
+|:-------------------:|:--------------------------:|
+|`tos = 0x00`         |`tos = 0x00`                |
+|`tos = 0x89`         |`tos = 0x89`                |
+|`tos = 0x93`         |`tos = 0x93`                |
+|`tos = 0x89`         |`tos = 0x89`                |
+
+### macOS
+| `sender4 127.0.0.1` | `sender6 ::ffff:127.0.0.1` |
+|:-------------------:|:--------------------------:|
+|`tos = 0x00`         |`tos = 0x00`                |
+|`tos = 0x89`         |`tos = 0x01`                |
+|`tos = 0x93`         |`tos = 0x93`                |
+|`tos = 0x89`         |`tos = 0x01`                |
+
+The observation is that on macOS setting the DSCP value using the `IPPROTO_IPV6`-level socket option `IPV6_TCLASS` is not possible. Only the ECN value is set.
+
 ## Output of `receiver6`
-When running `sender6 ::1` the output of `receiver6` is on all platforms:
-```
-tclass = 0x00
-tclass = 0x89
-tclass = 0x93
-tclass = 0x89
-```
-This is also the output of `receiver6` for `sender4 127.0.0.1` on FreeBSD and macOS and the output of `receiver6` for `sender6 ::ffff:127.0.0.1` on FreeBSD. On macOS, the output of `receiver6` for `sender6 ::ffff:127.0.0.1` is
-```
-tclass = 0x00
-tclass = 0x01
-tclass = 0x93
-tclass = 0x01
-```
-On Linux the output of `receiver6` for `sender4 127.0.0.1` or `sender6 ::ffff:127.0.0.1` is
-```
-tos = 0x00
-tos = 0x89
-tos = 0x93
-tos = 0x89
-```
 
+### FreeBSD
+| `sender6 ::1` | `sender6 ::ffff:127.0.0.1` | `sender4 127.0.0.1` |
+|:-------------:|:--------------------------:|:-------------------:|
+|`tclass = 0x00`|`tclass = 0x00`             |`tclass = 0x00`      |
+|`tclass = 0x89`|`tclass = 0x89`             |`tclass = 0x89`      |
+|`tclass = 0x93`|`tclass = 0x93`             |`tclass = 0x93`      |
+|`tclass = 0x89`|`tclass = 0x89`             |`tclass = 0x89`      |
 
+### Linux
+| `sender6 ::1` | `sender6 ::ffff:127.0.0.1` | `sender4 127.0.0.1` |
+|:-------------:|:--------------------------:|:-------------------:|
+|`tclass = 0x00`|`tos = 0x00`                |`tos = 0x00`         |
+|`tclass = 0x89`|`tos = 0x89`                |`tos = 0x89`         |
+|`tclass = 0x93`|`tos = 0x93`                |`tos = 0x93`         |
+|`tclass = 0x89`|`tos = 0x89`                |`tos = 0x89`         |
+
+So the observation is that on Linux an `IPPROTO_IP`-`cmsg_level` cmsg with `cmsg_type` of `IP_TOS` is used to report the DSCP and ECN fields on a AF_INET6 socket, if a UDP/IPv4 packet has been received.
+
+### macOS
+| `sender6 ::1` | `sender6 ::ffff:127.0.0.1` | `sender4 127.0.0.1` |
+|:-------------:|:--------------------------:|:-------------------:|
+|`tclass = 0x00`|`tclass = 0x00`             |`tclass = 0x00`      |
+|`tclass = 0x89`|`tclass = 0x01`             |`tclass = 0x89`      |
+|`tclass = 0x93`|`tclass = 0x93`             |`tclass = 0x93`      |
+|`tclass = 0x89`|`tclass = 0x01`             |`tclass = 0x89`      |
+
+The observation is that on macOS setting the DSCP value using the `IPPROTO_IPV6`-level socket option `IPV6_TCLASS` is not possible. Only the ECN value is set.
