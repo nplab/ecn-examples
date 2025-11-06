@@ -4,7 +4,10 @@ The programs have been tested on
 * macOS 15.7.1
 * macOS 26.0.1
 * Ubuntu 24.04
-  
+
+# Test Programs
+The sender sends initially a UDP packet with the a DSCP code point `CS0` and `Not-ECT`. Then a socket option is used to set the DSCP to `AF41` and `ECT(1)` which corresponds to `0x89`. The second UDP is sent using this setting. When sending the third UDP packet, a cmsg is used to specifiy a DSCP of `AF42` and `CE` which corresponds to `0x93`. The fourth UDP packet is then send with a cmsg and therefore use again `AF41` and `ECT(1)` coresponding to `0x89`.
+
 # Compilation
 ## FreeBSD and MacOS
 ```
