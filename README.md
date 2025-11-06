@@ -22,28 +22,48 @@ gcc -o sender6 sender6.c
 ```
 # Execution
 ## Output of `receiver4`
-When running `sender4 127.0.0.1` or `sender6 ::ffff:127.0.0.1` the output of `receiver4` is on all platforms:
+When running `sender4 127.0.0.1` the output of `receiver4` is on all platforms:
 ```
-tos = 0
-tos = 1
-tos = 2
-tos = 1
+tos = 0x00
+tos = 0x89
+tos = 0x93
+tos = 0x89
+```
+When running `sender6 ::ffff:127.0.0.1` the output is of `receiver4` on macOS:
+```
+tos = 0x00
+tos = 0x01
+tos = 0x93
+tos = 0x01
+```
+When running `sender6 ::ffff:127.0.0.1` the output of of `receiver4` is on FreeBSD or Linux:
+```
+tos = 0x00
+tos = 0x89
+tos = 0x93
+tos = 0x89
 ```
 ## Output of `receiver6`
 When running `sender6 ::1` the output of `receiver6` is on all platforms:
 ```
-tclass = 0
-tclass = 1
-tclass = 2
-tclass = 1
+tclass = 0x00
+tclass = 0x89
+tclass = 0x93
+tclass = 0x89
 ```
-This is also the output of `receiver6` for `sender4 127.0.0.1` or `sender6 ::ffff:127.0.0.1` on FreeBSD and MacOS.
-On Linux the output of `receiver6` for `sender4 127.0.0.1` or `sender ::ffff:127.0.0.1` is
+This is also the output of `receiver6` for `sender4 127.0.0.1` on FreeBSD and macOS and the output of `receiver6` for `sender6 ::ffff:127.0.0.1` on FreeBSD. On macOS, the output of `receiver6` for `sender6 ::ffff:127.0.0.1` is
 ```
-tos = 0
-tos = 1
-tos = 2
-tos = 1
+tclass = 0x00
+tclass = 0x01
+tclass = 0x93
+tclass = 0x01
+```
+On Linux the output of `receiver6` for `sender4 127.0.0.1` or `sender6 ::ffff:127.0.0.1` is
+```
+tos = 0x00
+tos = 0x89
+tos = 0x93
+tos = 0x89
 ```
 
 
