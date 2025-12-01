@@ -80,4 +80,4 @@ So the observation is that on Linux an `IPPROTO_IP`-`cmsg_level` cmsg with `cmsg
 |`tclass = 0x93`|`tclass = 0x93`             |`tclass = 0x93`      |
 |`tclass = 0x89`|`tclass = 0x01`             |`tclass = 0x89`      |
 
-The observation is that on macOS setting the DSCP value using the `IPPROTO_IPV6`-level socket option `IPV6_TCLASS` is not possible. Only the ECN value is set.
+The observation is that on macOS setting the DSCP value using the `IPPROTO_IPV6`-level socket option `IPV6_TCLASS` for UDP/IPv4 packets is not possible. Only the ECN value is set.
